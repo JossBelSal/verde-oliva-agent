@@ -1,0 +1,51 @@
+OLIVA MODEL AI
+├── app.py                   # Flask webhook (Telegram / Twilio)
+├── system_prompt.txt        # Prompt maestro (Markdown)
+├── .env                     # Credenciales y settings
+│
+├── db/
+│   ├── models.py            # SQLAlchemy ORM / DDL
+│   └── engine.py            # create_engine() ya configurado
+│
+├── core/
+│   ├── functions.py         # handlers de negocio (agenda, pagos…)
+│   ├── memory.py            # LangChain + Chroma
+│   ├── customers.py         # CRUD clientes (usa engine.py)
+│   ├── scheduler.py         # disponibilidad + citas (usa engine.py)
+│   └── embeddings.py        # FAISS + OpenAI embeddings
+│
+└── utils/
+    ├── gcalendar.py         # Google Calendar wrapper
+    └── helpers_tg.py        # send(), tg(), generación de teclados
+
+
+
+# Segunda estructura
+OLIVA MODEL AI/
+├── app.py                   # Flask webhook (Telegram / Twilio)
+├── system_prompt.txt        # Prompt maestro (Markdown)
+├── .env                     # Credenciales y settings (OpenAI, Firebase, SQL Azure)
+│
+├── db/                      # Todo lo relacionado a la base relacional
+│   ├── engine.py            # create_engine() con conexión a SQL Azure
+│   ├── models.py            # SQLAlchemy ORM: clientes, citas, personal, reviews…
+│   └── session.py           # factory de sesión (scoped_session)
+│
+├── firebase/                # Capa de chat-history en Firestore
+│   ├── client.py            # inicializa Firebase Admin SDK
+│   └── history.py           # funciones CRUD / query para “chat_history”
+│
+├── core/                    # Lógica de negocio independiente de infra
+│   ├── functions.py         # handlers de alto nivel (lista servicios, create_booking…)
+│   ├── customers.py         # CRUD de clientes (usa db/session.py)
+│   ├── scheduler.py         # lógica de disponibilidad y consulta de citas (usa db)
+│   └── embeddings.py        # FAISS + creación de vectores OpenAI
+│
+├── memory/                  # LangChain + retrieval sobre Firestore
+│   ├── memory.py            # ConversationBufferMemory + FirestoreVectorStore
+│   └── namespace.txt        # (opcional) mapeo de colecciones “chat_history”
+│
+└── utils/
+    ├── gcalendar.py         # wrapper de Google Calendar
+    ├── tg_helpers.py        # send_message(), build_keyboard(), parse_callback…
+    └── datetime_parser.py   # dateparser + reglas de normalización
