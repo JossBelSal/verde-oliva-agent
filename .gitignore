@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 .vscode/
+
+# Clave Firebase
+firebase/firebase_key.json
+firebase/*.json
