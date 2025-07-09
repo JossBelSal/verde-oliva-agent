@@ -1,13 +1,14 @@
 # db/models.py
-from datetime import datetime
+from datetime import datetime, date, time                # ← tipos Python
 from decimal import Decimal
 from sqlalchemy import (
-    Column, String, Integer, Text, Float, Numeric,
-    DateTime, MetaData, UniqueConstraint, Boolean
+    Column, String, Integer, Date, Time, Text, Numeric,
+    DateTime, MetaData, UniqueConstraint, Boolean, ForeignKey
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-# ───────── Convención global de nombres ─────────
+
+# ──────────── convención global de nombres ────────────
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -17,15 +18,13 @@ naming_convention = {
 }
 metadata_obj = MetaData(naming_convention=naming_convention)
 
-# ------------------------------------------------------------------
-#  Declarative Base
-# ------------------------------------------------------------------
+
 class Base(DeclarativeBase):
     metadata = metadata_obj
-    type_annotation_map = {
+    type_annotation_map = {          # default-mapping opcional
         int:     Integer,
         str:     String,
-        float:   Float,
+        float:   Numeric(10, 2),
         Decimal: Numeric(10, 2),
     }
 
@@ -39,14 +38,12 @@ class Base(DeclarativeBase):
         nullable=False
     )
 
-# ------------------------------------------------------------------
-# 1. Clientes
-# ------------------------------------------------------------------
+# ─────────────────────── 1. Cliente ───────────────────────
 class Cliente(Base):
     __tablename__ = "clientes_oliva"
     __table_args__ = (
-        UniqueConstraint("telefono", name="uq_clientes_telefono"),
-        UniqueConstraint("email",    name="uq_clientes_email"),
+        UniqueConstraint("telefono"),
+        UniqueConstraint("email"),
     )
 
     id:       Mapped[int]  = mapped_column(primary_key=True, autoincrement=True)
@@ -54,63 +51,62 @@ class Cliente(Base):
     telefono: Mapped[str]  = mapped_column(String(15),  index=True)
     email:    Mapped[str]  = mapped_column(String(120), index=True)
 
-    ventas       = relationship("Venta",       back_populates="cliente", cascade="all, delete-orphan")
-    citas        = relationship("Cita",        back_populates="cliente", cascade="all, delete-orphan")
-    valoraciones = relationship("Valoracion",  back_populates="cliente", cascade="all, delete-orphan")
-    quejas       = relationship("QuejaSugerencia", back_populates="cliente", cascade="all, delete-orphan")
+    citas = relationship("Cita", back_populates="cliente")   # Venta vendrá luego
 
-    def __repr__(self) -> str:
-        return f"<Cliente {self.id} {self.nombre}>"
-
-# ------------------------------------------------------------------
-# 2. Personal
-# ------------------------------------------------------------------
-
+# ─────────────────────── 2. Personal ───────────────────────
 class Empleado(Base):
     __tablename__ = "personal_oliva"
 
     id:       Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     nombre:   Mapped[str] = mapped_column(String(120), nullable=False)
-    puesto:   Mapped[str] = mapped_column(String(60))        # “estilista”, “recepción”…
+    puesto:   Mapped[str] = mapped_column(String(60))
     telefono: Mapped[str] = mapped_column(String(20))
     email:    Mapped[str] = mapped_column(String(120))
 
-    servicios = relationship("EmpleadoServicioHorario", back_populates="empleado")
-    citas     = relationship("Cita", back_populates="empleado")
-    asist     = relationship("AsistenciaEmpleado", back_populates="empleado")
+    citas = relationship("Cita", back_populates="empleado")
 
-# ------------------------------------------------------------------
-# 3-4. Catálogos de servicios y productos
-# ------------------------------------------------------------------
-
+# ───────────────── 3. Catálogo de servicios ─────────────────
 class Servicio(Base):
     __tablename__ = "servicios_oliva"
 
-    id          = Column(Integer, primary_key=True, autoincrement=True)
-    categoria   = Column(String(80),  nullable=False)       # “Cortes”
-    nombre      = Column(String(120), nullable=False)       # “Corte Dama”
-    
-    # --- datos mostrados al usuario ------------------------
-    duracion_txt = Column(String(40))      # “1-1.5 horas”
-    precio_txt   = Column(String(40))      # “$400–$500 MXP”
-    deposito_txt = Column(String(30))      # “No” | “$300 MXP”
-    detalles     = Column(Text)
+    id:          Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    categoria:   Mapped[str] = mapped_column(String(80),  nullable=False)
+    nombre:      Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
 
-    # --- datos normalizados para filtros / BI -------------
-    duracion_min = Column(Integer)         # mínimo en minutos
-    duracion_max = Column(Integer)         # máximo en minutos
-    precio_min   = Column(Numeric(10, 2))  # 400.00
-    precio_max   = Column(Numeric(10, 2))  # 500.00
-    deposito     = Column(Numeric(10, 2))  # NULL si no aplica
+    # texto que muestra Oliva
+    duracion_txt = mapped_column(String(40))
+    precio_txt   = mapped_column(String(40))
+    deposito_txt = mapped_column(String(30))
+    detalles     = mapped_column(Text)
 
-    activo       = Column(Boolean, default=True)
+    # valores normalizados
+    duracion_min = mapped_column(Integer)
+    duracion_max = mapped_column(Integer)
+    precio_min   = mapped_column(Numeric(10, 2))
+    precio_max   = mapped_column(Numeric(10, 2))
+    deposito     = mapped_column(Numeric(10, 2))
+    activo       = mapped_column(Boolean, default=True)
 
-class Producto(Base):
-    __tablename__ = "productos_oliva"
+# ─────────────────────── 5. Cita ───────────────────────
+class Cita(Base):
+    __tablename__ = "citas"
+    __table_args__ = (
+        UniqueConstraint("fecha", "hora", "empleado_id", name="uq_empleado_slot"),
+    )
 
-    id:             Mapped[int]         = mapped_column(primary_key=True, autoincrement=True)
-    nombre:         Mapped[str]         = mapped_column(String(120), unique=True, nullable=False)
-    categoria:      Mapped[str]         = mapped_column(String(60), index=True)
-    detalles:       Mapped[str]         = mapped_column(String(800))
-    precio:         Mapped[Decimal]     = mapped_column(Numeric(10,2))
-    
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    fecha: Mapped[date] = mapped_column(Date,  nullable=False)   # ← date/time Python
+    hora:  Mapped[time] = mapped_column(Time,  nullable=False)
+
+    cliente_id:  Mapped[int] = mapped_column(ForeignKey("clientes_oliva.id"),    nullable=False)
+    servicio_id: Mapped[int] = mapped_column(ForeignKey("servicios_oliva.id"),   nullable=False)
+    empleado_id: Mapped[int] = mapped_column(ForeignKey("personal_oliva.id"),    nullable=True)
+
+    cliente  = relationship("Cliente",  back_populates="citas")
+    servicio = relationship("Servicio")
+    empleado = relationship("Empleado", back_populates="citas")
+
+# ─────────────────────── (más tablas…) ───────────────────────
+#  Cuando crees Venta, DetalleTicket, etc. - agrégalas DESPUÉS
+#  y actualiza las relationships que habían quedado comentadas.

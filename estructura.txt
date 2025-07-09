@@ -44,6 +44,11 @@ OLIVA MODEL AI/
 ├── memory/                  # LangChain + retrieval sobre Firestore
 │   ├── memory.py            # ConversationBufferMemory + FirestoreVectorStore
 │   └── namespace.txt        # (opcional) mapeo de colecciones “chat_history”
+|
+|__ scripts/
+|    |
+|    |__ import_servicios.py # Extraccion de datos de archivo csv
+|
 │
 └── utils/
     ├── gcalendar.py         # wrapper de Google Calendar
