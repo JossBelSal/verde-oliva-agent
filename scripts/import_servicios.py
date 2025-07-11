@@ -47,22 +47,22 @@ def import_csv(path: str = CSV_FILE) -> None:
     session: Session = SessionLocal()
 
     for r in df.itertuples(index=False):
-        # 1. valores crudos (texto que verá la clienta)
-        dur_txt, pre_txt, dep_txt = r.Duración, r.Precio, r.Depósito
+        # Limpieza de strings y parseo de numeros
+        nombre = r.Nombre.strip()
+        categoria = r.Categoria.strip()
+        detalles = r.Detalles.strip()[:800] # Limitar a 800 caracteres
+        dur_lo, dur_hi = _mins(r.Duracion)
+        pre_lo, pre_hi = _monto(r.Precio)
+        deposito_num = _deposito(r.Deposito)
 
-        # 2. valores numéricos normalizados
-        dur_lo, dur_hi = _mins(dur_txt)
-        pre_lo, pre_hi = _monto(pre_txt)
-        deposito_num   = _deposito(dep_txt)
-
+        # Crear instancia sin ID
         srv = Servicio(
-            categoria    = r.Categoría.strip(),
-            nombre       = r.Nombre.strip(),
-            duracion_txt = dur_txt,
-            precio_txt   = pre_txt,
-            deposito_txt = dep_txt,
-            detalles     = r.Detalles.strip()[:800],
-
+            nombre       = nombre,
+            categoria    = categoria,
+            duracion_txt = r.Duracion,
+            precio_txt   = r.Precio,
+            deposito_txt = r.Deposito,
+            detalles     = detalles,
             duracion_min = dur_lo,
             duracion_max = dur_hi,
             precio_min   = pre_lo,
@@ -70,13 +70,20 @@ def import_csv(path: str = CSV_FILE) -> None:
             deposito     = deposito_num,
             activo       = True
         )
+        # Inyectamos el id existente basado en el nombre (PK logico)
+        existing_id = session.query(Servicio.id).filter_by(nombre=nombre).scalar()
 
-        # UPSERT por nombre (unique=True)
+        # Si ya existe, asignamos el ID para hacer un UPDATE
+        if existing_id is not None:
+            srv.id = existing_id
+        
+        #Merge hará INSERT (si id=None) o UPDATE (si id=tiene valor)
         session.merge(srv)
 
     session.commit()
     session.close()
-    print("✅  Servicios cargados / actualizados sin errores.")
+    print("✅  Servicios cargados / actualizados sin errores.\n"
+    "Se han cargado {} nuevos servicios.".format(len(df)))
 
 if __name__ == "__main__":
     import_csv()

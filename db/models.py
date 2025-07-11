@@ -64,6 +64,36 @@ class Empleado(Base):
     email:    Mapped[str] = mapped_column(String(120))
 
     citas = relationship("Cita", back_populates="empleado")
+    ausencias = relationship(
+        "DisponibilidadPersonal",
+        back_populates="empleado",
+        cascade="all, delete-orphan",
+    )
+
+# ─────────────────────── 2-Bis. Disponibilidad / Ausencias ───────────────────────
+class DisponibilidadPersonal(Base):
+    __tablename__ = "disponibilidad_personal"
+
+    id:           Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    empleado_id:  Mapped[int] = mapped_column(ForeignKey("personal_oliva.id"), nullable=False)
+
+    fecha_ini:    Mapped[date] = mapped_column(Date, nullable=False)
+    fecha_fin:    Mapped[date] = mapped_column(Date, nullable=False)
+
+    motivo:       Mapped[str | None] = mapped_column(String(200))
+
+    empleado = relationship("Empleado", back_populates="ausencias")
+
+    __table_args__ = (
+        # 1️⃣ evita solapar rangos duplicados para el mismo empleado
+        UniqueConstraint(
+            "empleado_id", "fecha_ini", "fecha_fin",
+            name="uq_empleado_rango"
+        ),
+        # 2️⃣ check: fecha_ini ≤ fecha_fin
+        {"sqlite_autoincrement": True},  # para SQLite
+    )
+
 
 # ───────────────── 3. Catálogo de servicios ─────────────────
 class Servicio(Base):
