@@ -18,6 +18,9 @@ db     = os.getenv("AZ_DB", "")
 user   = os.getenv("AZ_USER", "")
 pass_  = os.getenv("AZ_PASS", "")
  
+if not all([driver, host, db, user, pass_]):
+    logger.error("❌ Faltan variables de entorno para la conexión a Azure SQL.")
+    raise EnvironmentError("Faltan AZ_* en ENV") # utilizar * para saber qué falta
 
 # raw_pwd es un str garantizado, ahora sí:
 pwd = quote_plus(pass_)

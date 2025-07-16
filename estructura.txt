@@ -54,3 +54,59 @@ OLIVA MODEL AI/
     ├── gcalendar.py         # wrapper de Google Calendar
     ├── tg_helpers.py        # send_message(), build_keyboard(), parse_callback…
     └── datetime_parser.py   # dateparser + reglas de normalización
+
+
+# Tercera estructura
+OLIVA_MODEL_AI/
+├── app/                               # capa HTTP / mensajería
+│   ├── __init__.py                    # create_app() + registrar blueprints
+│   ├── webhook.py                     # Flask route: Telegram / Twilio
+│   ├── admin_bot.py                   # endpoint solo-dueña (comandos SQL)
+│   └── keyboards.py                   # builders de inline / reply buttons
+│
+├── system_prompt.txt                  # prompt maestro de Oliva
+├── .env                               # claves OpenAI, Azure SQL, Firebase…
+│
+├── db/                                # SQL Azure
+│   ├── engine.py                      # create_engine(pool_pre_ping=True,…)
+│   ├── session.py                     # SessionLocal (scoped_session)
+│   └── models/                        # ORM dividido en módulos
+│       ├── __init__.py                # re-exporta Base y tablas
+│       ├── base.py                    # DeclarativeBase + convención nombres
+│       ├── cliente.py
+│       ├── servicio.py
+│       ├── producto.py
+│       ├── empleado.py
+│       ├── cita.py
+│       ├── disponibilidad.py          # <─ NUEVA (ausencias / vacaciones)
+│       └── venta.py
+│
+├── firebase/
+│   ├── client.py                      # Admin SDK inicial
+│   └── history.py                     # CRUD “chat_history”
+│
+├── core/                              # lógica de negocio (no HTTP)
+│   ├── functions.py                   # function-calling dispatch
+│   ├── customers.py                   # CRUD + validaciones
+│   ├── scheduler.py                   # reglas de agenda + disponibilidad
+│   ├── embeddings.py                  # FAISS + OpenAI vectors
+│   └── admin_actions.py               # add_employee, mark_staff_unavailable…
+│
+├── memory/                            # LangChain
+│   ├── memory.py                      # ConversationBufferMemory + Firestore
+│   └── namespace.txt                  # (opcional) mapeo colección
+│
+├── utils/
+│   ├── gcalendar.py                   # wrapper Google Calendar
+│   ├── tg_helpers.py                  # send_message(), parse_callback()…
+│   └── datetime_parser.py             # dateparser + reglas MX
+│
+├── scripts/                           # importaciones y utilidades CLI
+│   ├── import_servicios.py            # carga CSV → servicios_oliva
+│   ├── import_personal.py             # carga CSV → personal_oliva
+│   ├── import_disponibilidad.py       # bloqueos masivos (vacaciones)
+│   ├── seed_db.py                     # crea tablas + datos demo
+│   └── migrate.py                     # helpers Alembic opcionales
+│
+└── tests/                             # pytest (unit + integration)
+    └── …
