@@ -116,6 +116,18 @@ class Servicio(Base):
     precio_max   = mapped_column(Numeric(10, 2))
     deposito     = mapped_column(Numeric(10, 2))
     activo       = mapped_column(Boolean, default=True)
+# ─────────────────────── 4. Productos ───────────────────────
+class Producto(Base):
+    __tablename__ = "productos_oliva"
+
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    nombre     = Column(String(120), unique=True, nullable=False)
+    categoria  = Column(String(80),  nullable=False)
+    detalles   = Column(Text,       nullable=False)
+    precio     = Column(Numeric(10, 2))        # valor numérico
+
+    # created_at / updated_at vienen de la declarative Base
+
 
 # ─────────────────────── 5. Cita ───────────────────────
 class Cita(Base):
