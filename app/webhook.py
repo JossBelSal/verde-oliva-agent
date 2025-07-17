@@ -36,7 +36,7 @@ def start(update, context):
 
     context.bot.send_message(
         chat_id=chat_id,
-        text=f"¡Hola {user.first_name}! Soy Oliva 🤖. ¿Qué deseas hacer?",
+        text=f"¡Hola {user.first_name}! Soy Oliva. ¿Qué deseas hacer?",
         reply_markup=main_menu_inline()
     )
 
@@ -54,7 +54,7 @@ def handle_text(update, context):
     else:
         context.bot.send_message(
             chat_id=chat_id,
-            text="No entendí. Usa el menú ⬇️",
+            text="No entendí. Usa el menú",
             reply_markup=main_menu_inline()
         )
 
@@ -89,11 +89,11 @@ def handle_callback(update, context):
         if servicio:
             detalle = (
                 f"*{servicio['Nombre']}*\n"
-                f"📂 Categoría: {servicio['Categoria']}\n"
-                f"⏱️ Duración: {servicio['Duracion']}\n"
-                f"💵 Precio: {servicio['Precio']}\n"
-                f"📌 Depósito: {servicio['Deposito']}\n"
-                f"📝 Detalles: {servicio['Detalles']}"
+                f"Categoría: {servicio['Categoria']}\n"
+                f"Duración: {servicio['Duracion']}\n"
+                f"Precio: {servicio['Precio']}\n"
+                f"Depósito: {servicio['Deposito']}\n"
+                f"Detalles: {servicio['Detalles']}"
             )
             context.bot.send_message(chat_id=chat_id, text=detalle, parse_mode="Markdown")
         else:
