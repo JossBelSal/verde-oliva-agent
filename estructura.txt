@@ -61,25 +61,23 @@ OLIVA_MODEL_AI/
 ├── app/                               # capa HTTP / mensajería
 │   ├── __init__.py                    # create_app() + registrar blueprints
 │   ├── webhook.py                     # Flask route: Telegram / Twilio
-│   ├── admin_bot.py                   # endpoint solo-dueña (comandos SQL)
+│   ├── admin_agente.py                   # endpoint solo-dueña (comandos SQL)
 │   └── keyboards.py                   # builders de inline / reply buttons
 │
 ├── system_prompt.txt                  # prompt maestro de Oliva
 ├── .env                               # claves OpenAI, Azure SQL, Firebase…
 │
+│── data/
+│   ├── servicios.csv            # servicios disponibles
+│   ├── personal.csv             # personal disponible
+│   ├── productos.csv            # productos disponibles
+│
 ├── db/                                # SQL Azure
 │   ├── engine.py                      # create_engine(pool_pre_ping=True,…)
 │   ├── session.py                     # SessionLocal (scoped_session)
-│   └── models/                        # ORM dividido en módulos
-│       ├── __init__.py                # re-exporta Base y tablas
-│       ├── base.py                    # DeclarativeBase + convención nombres
-│       ├── cliente.py
-│       ├── servicio.py
-│       ├── producto.py
-│       ├── empleado.py
-│       ├── cita.py
-│       ├── disponibilidad.py          # <─ NUEVA (ausencias / vacaciones)
-│       └── venta.py
+│   ├── models.py                      # Base, Cliente, Empleado, Disponibilidad_Personal, Servicio, Producto y Cita
+│   ├── __init__.py                    # inicializa la base de datos
+│   └── modificar tablas.py
 │
 ├── firebase/
 │   ├── client.py                      # Admin SDK inicial
@@ -90,9 +88,11 @@ OLIVA_MODEL_AI/
 │   ├── customers.py                   # CRUD + validaciones
 │   ├── scheduler.py                   # reglas de agenda + disponibilidad
 │   ├── embeddings.py                  # FAISS + OpenAI vectors
-│   └── admin_actions.py               # add_employee, mark_staff_unavailable…
+│   ├── admin_actions.py               # add_employee, mark_staff_unavailable…
+|   └── message_predictor.py
 │
 ├── memory/                            # LangChain
+│   ├── __init__.py                    # inicializa FirestoreVectorStore
 │   ├── memory.py                      # ConversationBufferMemory + Firestore
 │   └── namespace.txt                  # (opcional) mapeo colección
 │
@@ -104,7 +104,7 @@ OLIVA_MODEL_AI/
 ├── scripts/                           # importaciones y utilidades CLI
 │   ├── import_servicios.py            # carga CSV → servicios_oliva
 │   ├── import_personal.py             # carga CSV → personal_oliva
-│   ├── import_disponibilidad.py       # bloqueos masivos (vacaciones)
+│   ├── import_productos.py            # carga CSV → productos_oliva
 │   ├── seed_db.py                     # crea tablas + datos demo
 │   └── migrate.py                     # helpers Alembic opcionales
 │
