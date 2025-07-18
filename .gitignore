@@ -3,6 +3,5 @@ __pycache__/
 *.pyc
 .vscode/
 
-# Clave Firebase
-firebase/firebase_key.json
-firebase/*.json
+firebase_key.json
+google_calendar_oauth.json
