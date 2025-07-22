@@ -82,6 +82,7 @@ OLIVA_MODEL_AI/
 ├── firebase/
 │   ├── client.py                      # Admin SDK inicial
 │   └── history.py                     # CRUD “chat_history”
+|   └── langchain_memory.py            # Memoria para LangChain (FirestoreChatHistory)
 │
 ├── core/                              # lógica de negocio (no HTTP)
 │   ├── functions.py                   # function-calling dispatch
