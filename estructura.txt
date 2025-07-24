@@ -58,14 +58,21 @@ OLIVA MODEL AI/
 
 # Tercera estructura
 OLIVA_MODEL_AI/
+│
+├── alembic 
+│   ├── env.py                          # configuración de Alembic
+│   ├── script.py.mako                  # plantilla de migración
+│   ├── __pycache__/                     # caché de Python
+│   │     └── env.cpython-310.pyc
+│   ├── versions/                        # migraciones generadas
+│   │   └── 20231001_123456_create_tables.py  # ejemplo de migración
+│   └── README.md                       # documentación de Alembic
+│
 ├── app/                               # capa HTTP / mensajería
 │   ├── __init__.py                    # create_app() + registrar blueprints
 │   ├── webhook.py                     # Flask route: Telegram / Twilio
 │   ├── admin_agente.py                   # endpoint solo-dueña (comandos SQL)
 │   └── keyboards.py                   # builders de inline / reply buttons
-│
-├── system_prompt.txt                  # prompt maestro de Oliva
-├── .env                               # claves OpenAI, Azure SQL, Firebase…
 │
 │── data/
 │   ├── servicios.csv            # servicios disponibles
@@ -80,26 +87,33 @@ OLIVA_MODEL_AI/
 │   └── modificar tablas.py
 │
 ├── firebase/
+│   ├── __init__.py                    # inicializa Firebase Admin SDK
 │   ├── client.py                      # Admin SDK inicial
 │   └── history.py                     # CRUD “chat_history”
 |   └── langchain_memory.py            # Memoria para LangChain (FirestoreChatHistory)
 │
 ├── core/                              # lógica de negocio (no HTTP)
+│   ├── __init__.py                    # inicializa core
 │   ├── functions.py                   # function-calling dispatch
-│   ├── customers.py                   # CRUD + validaciones
+│   ├── customers.py                   # CRUD + validaciones cpmo email, teléfono 
 │   ├── scheduler.py                   # reglas de agenda + disponibilidad
 │   ├── embeddings.py                  # FAISS + OpenAI vectors
 │   ├── admin_actions.py               # add_employee, mark_staff_unavailable…
-|   └── message_predictor.py
+|   └── message_predictor.py           # predict_message_type() para routing
 │
 ├── memory/                            # LangChain
 │   ├── __init__.py                    # inicializa FirestoreVectorStore
 │   ├── memory.py                      # ConversationBufferMemory + Firestore
 │   └── namespace.txt                  # (opcional) mapeo colección
 │
+├── models/                            # modelos de negocio
+│   ├── modelo_intencion.pkl           # modelo de ML para intenciones
+│   ├── modelo_sentimiento.pkl         # modelo de ML para sentimientos
+│   ├── modelo_servicio.pkl            # modelo de ML para servicios
+│
 ├── utils/
 │   ├── gcalendar.py                   # wrapper Google Calendar
-│   ├── tg_helpers.py                  # send_message(), parse_callback()…
+│   ├── helpers.py                     # send_message(), parse_callback() y generación de teclados
 │   └── datetime_parser.py             # dateparser + reglas MX
 │
 ├── scripts/                           # importaciones y utilidades CLI
@@ -109,5 +123,17 @@ OLIVA_MODEL_AI/
 │   ├── seed_db.py                     # crea tablas + datos demo
 │   └── migrate.py                     # helpers Alembic opcionales
 │
-└── tests/                             # pytest (unit + integration)
-    └── …
+│── tests/                             # pytest (unit + integration)
+│    └── __pycache__/                   # caché de Python
+│    │    ├── test_db.cpython-310-pytest-8.4.1.pyc
+│    │    └── test_scheduler.cpython-310-pytest-8.4.1.pyc
+│    ├── gcalendarTest.py                     # pruebas de Google Calendar
+│    ├── probar_memoria.py                # pruebas de memoria LangChain
+│    ├── test_db.py                     # pruebas de base de datos
+│    └── test_scheduler.py              # pruebas de lógica de agenda
+│
+│── README.md                          # documentación del proyecto
+│── alembic.ini                        # configuración de Alembic
+│── estructura.txt                     # este archivo
+│── system_prompt.txt                  # prompt maestro (Markdown)
+└── .env                                # credenciales y configuración (OpenAI, Firebase, SQL Azure 

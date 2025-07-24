@@ -1,0 +1,54 @@
+# requirements.txt
+
+# === Núcleo de Oliva ===
+openai>=1.14.3
+python-dotenv>=1.0.1
+langchain>=0.2.0          # embeddings + memoria
+faiss-cpu>=1.7.4          # búsqueda vectorial local
+
+# === Framework web (webhook) ===
+Flask>=3.0.3
+# Si usas Telegram Bot API nativa:
+python-telegram-bot>=20.7
+# (comenta si usas otra librería o Twilio únicamente)
+
+# === SQL Alchemy + Azure SQL (ODBC) ===
+SQLAlchemy>=2.0.30
+pyodbc>=5.1.0              # driver ODBC 18
+pandas>=2.2.2              # importaciones CSV
+
+# === Alembic (migraciones) ===
+alembic>=1.13.1
+
+# === Firebase / Firestore ===
+google-cloud-firestore>=2.15.0
+google-api-python-client>=2.126.0   # wrapper Google Calendar
+google-auth>=2.29.0
+
+# === Machine Learning liviano (predicción intención) ===
+scikit-learn>=1.5.0
+joblib>=1.4.2
+numpy>=1.26.4
+
+# === NLP utilidades ===
+dateparser>=1.2.0           # parseo fechas MX
+python-dateutil>=2.9.0
+regex>=2024.4.16            # expresiones regulares robustas
+unicodedata2>=15.1.0        # normalización ASCII (Windows)
+
+# === Tests ===
+pytest>=8.2.0
+pytest-mock>=3.14.0
+
+# === Tipado / calidad opcional ===
+mypy>=1.10.0
+pylint>=3.2.2
+
+# 💡 Uso rápido
+# python -m venv .venv
+# source .venv/bin/activate  # en Windows: .venv\Scripts\activate
+# pip install --upgrade pip
+# pip install -r requirements.txt
+
+# Si planeas desplegar en un entorno slim (por ejemplo, Docker Alpine), añade paquetes del sistema:
+# RUN apk add --no-cache gcc musl-dev unixodbc-dev
